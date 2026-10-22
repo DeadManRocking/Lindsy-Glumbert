@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#07181a">
+<title>Glumbert</title>
+<link rel="manifest" href="manifest.json"><link rel="icon" href="icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500&family=Lora:ital,wght@0,600;1,400&family=Nunito:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#07181a;--deep:#0d2a2c;--glow:#e8b86a;--ink:#e9efe6;--soft:#9db3a6;--voice:"Lora",Georgia,serif;--ui:"Nunito",system-ui,sans-serif}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%}
+body{background:radial-gradient(120% 80% at 50% 0,var(--deep),var(--bg) 70%) fixed;color:var(--ink);font:400 16px/1.5 var(--ui);padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0)}
+main{max-width:30rem;margin:0 auto;padding:1.4rem 1.2rem 3rem}
+h1{font:600 1.5rem/1.2 var(--voice);margin:.3rem 0 .1rem;text-align:center}
+.stage{text-align:center;color:var(--soft);font-size:.9rem;margin:0 0 1rem}
+.voice{font:italic 400 1.1rem/1.6 var(--voice);margin:0 0 1rem}
+.sub{color:var(--soft);font-size:.92rem}
+input,textarea{width:100%;font:600 1.1rem var(--voice);color:var(--ink);background:rgba(255,255,255,.05);border:1px solid rgba(232,184,106,.35);border-radius:14px;padding:.8rem 1rem}
+:focus-visible{outline:2px solid var(--glow);outline-offset:2px}
+.card,.opt,.care button,.act{background:linear-gradient(160deg,rgba(95,122,74,.28),rgba(58,37,71,.38));border:1px solid rgba(157,179,166,.25);color:var(--ink);box-shadow:0 10px 24px -14px #000,inset 0 1px 0 rgba(255,255,255,.06)}
+.opts{display:grid;gap:.7rem;margin:1.2rem 0}
+.opt{text-align:left;font:600 1rem var(--ui);border-radius:18px 18px 18px 6px;padding:1rem 1.1rem;cursor:pointer}
+.opt[aria-pressed=true]{border-color:var(--glow);box-shadow:0 0 22px -6px var(--glow)}
+.go{font:600 1rem var(--ui);color:#1a1205;background:var(--glow);border:0;border-radius:999px;padding:.75rem 1.6rem;cursor:pointer}.go:disabled{opacity:.35}
+#pw{position:relative;width:100%;aspect-ratio:1;border-radius:26px;overflow:hidden;box-shadow:0 22px 40px -18px #000;background:#0a2224;transition:transform .6s}
+#pw img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .6s}
+#pw img.on{opacity:1}#pw.busy img.on{animation:pu 2s ease infinite}
+@keyframes pu{50%{opacity:.7}}
+#pw.melan{transform:rotate(12deg)}
+#pw svg{position:absolute;inset:0;width:100%;height:100%}
+.line{min-height:4.6rem;margin:1rem 0 .6rem;text-align:center}
+.care{display:grid;grid-template-columns:repeat(4,1fr);gap:.55rem;margin:.4rem 0 .9rem}
+.care button{border-radius:16px;padding:.7rem .2rem;font:600 .78rem var(--ui);cursor:pointer;display:grid;gap:.3rem;justify-items:center}
+.care svg{width:30px;height:30px;stroke:var(--glow);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.care button.rest{opacity:.45}
+.care button.bounce{animation:bn .45s}
+@keyframes bn{40%{transform:translateY(-8px) scale(1.04)}}
+.acts{display:grid;gap:.55rem}.act{border-radius:16px 16px 16px 5px;padding:.85rem 1rem;font:600 1rem var(--ui);text-align:left;cursor:pointer}
+.tray{display:flex;gap:.5rem;justify-content:center;margin:.4rem 0}.tray button{font-size:1.5rem;padding:.4rem .8rem;border-radius:14px;border:1px solid rgba(157,179,166,.3);background:rgba(255,255,255,.06);cursor:pointer}
+#sheet{position:fixed;inset:auto 0 0 0;max-width:30rem;margin:0 auto;background:#0b2326;border-radius:22px 22px 0 0;padding:1rem 1.1rem calc(1rem + env(safe-area-inset-bottom,0));box-shadow:0 -20px 40px -10px #000;display:none;max-height:75vh;flex-direction:column;gap:.7rem}
+#sheet.open{display:flex}#log{overflow:auto;display:grid;gap:.6rem}
+.me{justify-self:end;color:var(--soft);font-size:.95rem;max-width:85%}.him{font:italic 1.05rem/1.55 var(--voice)}
+.row{display:flex;gap:.5rem}.row input{flex:1;font:400 1rem var(--ui)}
+.x{background:none;border:0;color:var(--soft);justify-self:end;font-size:1rem;cursor:pointer}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.sub2{display:grid;gap:.9rem}.back{background:none;border:0;color:var(--soft);font:600 .95rem var(--ui);cursor:pointer;padding:0}
+.hand{font:500 1.35rem/1.5 "Caveat",cursive;white-space:pre-wrap}.note{padding:1rem 1.1rem;border-radius:18px;background:linear-gradient(160deg,rgba(95,122,74,.22),rgba(58,37,71,.3));box-shadow:0 10px 24px -14px #000}
+.gal{display:grid;grid-template-columns:1fr 1fr;gap:.7rem}.gal figure{margin:0}.gal img{width:100%;border-radius:14px;aspect-ratio:1;object-fit:cover}.gal figcaption{font:italic .85rem var(--voice);color:var(--soft)}
+#th{position:fixed;top:calc(.7rem + env(safe-area-inset-top,0));right:.8rem;width:54px;height:54px;border-radius:50%;overflow:hidden;border:2px solid var(--glow);box-shadow:0 8px 18px -6px #000;opacity:0;pointer-events:none;transition:opacity .3s;cursor:pointer;z-index:5}#th.on{opacity:1;pointer-events:auto}#th img{width:100%;height:100%;object-fit:cover}
+.ttt{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem}.ttt button{aspect-ratio:1;font:600 2rem var(--voice);color:var(--glow);border-radius:14px;border:1px solid rgba(157,179,166,.3);background:rgba(255,255,255,.05);cursor:pointer}
+#bd{width:100%;max-width:320px;margin:0 auto;display:block}.cf{position:fixed;inset:0;pointer-events:none;font-size:2rem;display:grid;place-items:center;animation:cf 2.4s forwards}@keyframes cf{to{opacity:0;transform:translateY(-40px)}}
+</style></head><body><main id="app"></main>
+<div id="sheet" role="dialog" aria-label="Talk"><button class="x" id="sx">close</button><div id="log"></div><div class="row"><input id="ti" maxlength="400" autocomplete="off"><button class="go" id="ts">Say</button></div></div>
+<script>
+const d=e=>atob(e.split("").reverse().join(""));const CFG={anthropic:"",openai:d("=EURnR2YTJ2bwgDdOR1UsVkVVtWa2hjc10Cb0RUOodlZJBjNj5UeyZnNGp2YhFUQxE2XadWZCVVZvdFSWFndtoEURt0ba9UQzMjdKZ0aixmQzQVQuNTaHlWQtV2Vt4ERwckNslXeTJkVDp2R2ATazoVR0AXSMt2NRFHZpxURmRTZhJnar1WdnZnd0kVUThzROFlTKV1NWNmY30kMx1iavJHcts2c"),gemini:d("=E1dhhnej5GMBFETQh0d4JmaOJXaU9VOlJjdwczUCRFTGlDWFFndZpkcCFTS24kU4IWQuEVQ")};
+const RULES=" Never say the words: mother, son, husband, grief. Never claim to be a therapist or to fix anything. Never sarcastic at her expense; warm or warmly dramatic only. Never assume she has a home, kitchen, car, or fixed place. Never mention health, hunger, decline, or neglect. If she has been away, you waited, with dignity and never blame.";
+const BAN=/\b(mother|mom|mommy|son|husband|grie(f|ve|ved|ving))\b/i;
+const P=[{k:"body",t:"Body",o:["Assertively Round","Suspicious Rectangle","Lumpy Oval of Uncertain Opinion"]},
+{k:"eyes",t:"Eyes",o:["Three Googly (Classic)","One Enormous (Focused)","Appears To Be Judging You (Bilateral)"]},
+{k:"mouth",t:"Mouth",o:["Tiny Dignified Frown","Enthusiastic Gums","Smirk of Unknown Origin"]},
+{k:"limbs",t:"Limbs",o:["Two Arms (Conventional)","Four Arms (Prepared)","One Wing, One Arm, One Question Mark"]},
+{k:"hat",t:"Hat",o:["The Dignified Bowler","The Enormous Beret","The Hat That Cannot Be Explained"]},
+{k:"trait",t:"Personality",o:["Suspicious of Tuesdays","Overly Enthusiastic About Soup","Carries a Grudge Like It's a Loved One","Believes He Is Being Watched (He Is Correct)","Dramatically Misunderstands Things But Confidently"]}];
+// Locked descriptor phrases, same order as the options above.
+const D={body:["soft assertively round body, plump and self-assured","guarded rectangular body, narrower at top, one side slightly concave, posture of careful watchfulness","lumpy oval body of uncertain opinion, asymmetrical, endearingly unsure"],
+eyes:["three googly eyes of different sizes, glossy and wobbling","one enormous liquid eye dominating the face, deep iris, faint concentric ring, direct overwhelming gaze","two heavy-lidded eyes with an appraising, judging stare"],
+mouth:["tiny dignified frown","wide enthusiastic toothless gums","a smirk of unknown origin, one corner raised"],
+limbs:["two small conventional arms","four small prepared arms, held ready","one little wing, one arm, and one curling question-mark limb"],
+hat:["a dignified bowler hat","an enormous velvet beret","a hat that cannot be explained, improbable and perfectly placed"],
+trait:["faintly wary of the day of the week","carrying a hint of soup-steam enthusiasm","a quietly held grudge in the brow","the alert look of someone being watched","confident and cheerfully mistaken"]};
+const SD=["small, newly arrived, tender light","slightly gangly, growing into himself, awkward and endearing","fully himself, steady glow","distinguished, a little silver at the edges, composed","slower, deliberate, something ancient in the eyes"];
+const SN=["Sproutling","Awkward Phase","Full","Distinguished Elder","Retiredment"];
+const MD={Suspicious:"narrowed, watchful expression",Delighted:"warm golden light, barely containing something good",Pensive:"soft, far-off gaze, quiet light",Smug:"serenely self-satisfied, chin slightly raised","Dramatically Melancholy":"tilted twelve degrees, rain-adjacent atmosphere","Currently Processing":"mid-thought, faint swirling glow","Quietly Pleased":"gentle contentment, soft glow"};
+const MOODS=["Suspicious","Delighted","Pensive","Smug","Currently Processing","Quietly Pleased"];
+const MN={Suspicious:"Suspicious",Delighted:"Genuinely Delighted",Pensive:"Pensive",Smug:"Inexplicably Smug","Dramatically Melancholy":"Dramatically Melancholy","Currently Processing":"Currently Processing","Quietly Pleased":"Quietly Pleased"};
+const B={hydrate:["He drinks with enormous ceremony. The water has been judged acceptable.","He receives the water. A small, private nod.","Hydrated. He would like it noted that he was going to do that anyway."],
+snack:["He eats it slowly, as one does a rare thing. He has formed an opinion.","The snack is gone. He will not be taking questions.","He chews with great seriousness. Verdict: favorable."],
+tend:["Something turns up where you were tending. He regards it as a personal discovery.","The ground gave something up. He is pretending he expected it."],
+wiggle:["He wiggles. Briefly, magnificently, and then pretends it did not happen.","A wiggle occurs. Witnesses are asked to remain calm."],
+refuse:["He declines. He will think about it. He is thinking about it now.","Not yet. He has his reasons, and the reasons are private."],
+tell:["He listens with his whole face. Then, with great care: Noted. Deeply noted.","He holds that for a moment. It is safe with him."],
+word:["He takes the word and turns it over. He will use it. Possibly correctly.","A new word. He says it to himself twice, like a pebble."],
+disc:["A small curious thing: a leaf folded exactly once, as if on purpose.","He found a pebble with a line through it. He is calling it important.","Something glinted. It was nothing. He is keeping it anyway."],
+away:["He waited. He wants you to know he did it with dignity.","There you are. He was only a little dramatic about the waiting.","He kept your place. It was not difficult. It was a little difficult."],
+hi:["He regards you. Suspicion, softened by a small amount of hope.","Oh. It's you. He had been hoping it would be."],
+fail:["I have something to say about how I look today. It is being considered. I will wait."]};
+const rnd=a=>a[Math.floor(Math.random()*a.length)],esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const KEY="glumbert_state_v2",DAY=864e5;
+const load=()=>{try{return JSON.parse(localStorage.getItem(KEY))||{}}catch{return{}}};
+let S=load();
+const save=()=>{ // prune to keep well under the ~5MB localStorage ceiling
+  for(const [k,n] of [["journal",50],["gallery",50],["discoveries",50],["visit_log",100],["conversation_log",20]])if(S[k]&&S[k].length>n)S[k]=S[k].slice(-n);
+  try{localStorage.setItem(KEY,JSON.stringify(S))}catch{}};
+const $=h=>{const d=document.createElement("div");d.innerHTML=h.trim();return d.firstChild};
+const app=document.getElementById("app");
+const daysOld=()=>Math.floor((Date.now()-S.first_launch_date)/DAY)+1;
+const stageIx=()=>{const d=daysOld();return d<=14?0:d<=35?1:d<=63?2:d<=77?3:4};
+const stageName=()=>stageIx()==2?S.name.split(" ")[0]:SN[stageIx()];
+// ---------- tiny IndexedDB for portrait blob (never base64 in localStorage) ----------
+const idb=()=>new Promise((res,rej)=>{const r=indexedDB.open("glumbert",1);r.onupgradeneeded=()=>r.result.createObjectStore("kv");r.onsuccess=()=>res(r.result);r.onerror=()=>rej()});
+const kv=async(m,k,v)=>{try{const db=await idb();return await new Promise(res=>{const t=db.transaction("kv",m==="get"?"readonly":"readwrite").objectStore("kv");const q=m==="get"?t.get(k):t.put(v,k);q.onsuccess=()=>res(q.result);q.onerror=()=>res(null)})}catch{return null}};
+// ---------- AI ----------
+async function ask(msgs,max,ms=9000){const c=new AbortController(),t=setTimeout(()=>c.abort(),ms),sy=sys()+RULES;let o=null;
+  try{if(!CFG.anthropic)throw 0;const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",signal:c.signal,headers:{"content-type":"application/json","x-api-key":CFG.anthropic,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:"claude-haiku-5-5",max_tokens:max||200,system:sy,messages:msgs.map(m=>({role:m.role,content:m.text}))})});
+    if(r.ok){const d=await r.json();o=(d.content||[]).map(b=>b.text||"").join("").trim()}}catch{}
+  if(!o){try{const r=await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",{method:"POST",signal:c.signal,headers:{"content-type":"application/json","x-goog-api-key":CFG.gemini},body:JSON.stringify({systemInstruction:{parts:[{text:sy}]},contents:msgs.map(m=>({role:m.role==="assistant"?"model":"user",parts:[{text:m.text}]})),generationConfig:{maxOutputTokens:max||200,temperature:.95}})});
+    if(r.ok){const d=await r.json();o=(d.candidates?.[0]?.content?.parts||[]).map(p=>p.text||"").join("").trim()}}catch{}}
+  clearTimeout(t);return o&&!BAN.test(o)?o:null}
+async function img(prompt){try{const r=await fetch("https://api.openai.com/v1/images/generations",{method:"POST",headers:{"content-type":"application/json",authorization:"Bearer "+CFG.openai},body:JSON.stringify({model:"gpt-image-1",prompt,size:"1024x1024",quality:"medium",output_format:"jpeg",output_compression:80})});
+    if(r.ok){const d=await r.json();if(d.data?.[0]?.b64_json)return{image:d.data[0].b64_json,mime:"image/jpeg"}}}catch{}
+  try{const r=await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image:generateContent",{method:"POST",headers:{"content-type":"application/json","x-goog-api-key":CFG.gemini},body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{responseModalities:["TEXT","IMAGE"]}})});
+    if(r.ok){const d=await r.json(),p=(d.candidates?.[0]?.content?.parts||[]).find(x=>x.inlineData);if(p)return{image:p.inlineData.data,mime:p.inlineData.mimeType}}}catch{}
+  return{image:null}}
+function sys(){const v=S.taught_vocabulary||[];const w=v.length>10?[...v].sort(()=>Math.random()-.5).slice(0,5+Math.floor(Math.random()*6)):v;
+  const away=Math.floor((Date.now()-(S.prev_visit||Date.now()))/DAY);
+  return `You are ${S.name}, a Plantimal — part plant, part animal, entirely yourself. You are ${SN[stageIx()]}, ${daysOld()} days old. Trait: ${S.assembly.trait}. Mood: ${MN[mood]}. Words she taught you: ${w.join(", ")||"none yet"}. Recent things she told you: ${(S.conversation_log||[]).slice(-5).map(x=>x.u).join(" | ")||"nothing yet"}. Visits: ${S.visits} of ${daysOld()}. Last visit: ${away} days ago. Max 4 sentences. Never assume home/kitchen/car/location. You have a nemesis — never described, only referenced obliquely. You have opinions about clouds. When she's been gone: you waited. Dignity, never guilt.`}
+// ---------- portrait ----------
+const hashStr=s=>{let h=5381;for(const c of s)h=(h*33^c.charCodeAt(0))>>>0;return h.toString(36)};
+const pHash=()=>hashStr([stageIx(),mood,...P.map(p=>S.assembly[p.k])].join("|"));
+function pPrompt(){const a=P.map(p=>D[p.k][p.o.indexOf(S.assembly[p.k])]);
+  return `A painterly portrait of a small creature, part plant and part animal. Body: ${a[0]}. Eyes: ${a[1]}. Mouth: ${a[2]}. Limbs: ${a[3]}. Wearing ${a[4]}. Demeanor: ${a[5]}. Age: ${SD[stageIx()]}. Mood: ${MD[mood]}. Rendered in a painterly, volumetric style — subsurface light glowing through organic flesh, moss-and-velvet texture, bioluminescent quality, a soft glow in the belly, deep cinematic atmospheric background from rich dark teal to near-black. Neotenic proportions. Spooky-cute. Heartbreakingly expressive. The hat is always present. No text.`}
+let gen=false,taps=0,tt;
+function show(url){const w=document.getElementById("pw");if(!w)return;const n=new Image();n.onload=()=>{w.querySelectorAll("img").forEach(i=>i.remove());n.className="";w.prepend(n);requestAnimationFrame(()=>n.classList.add("on"));w.querySelector("svg")?.remove()};n.src=url;n.alt=S.name;}
+async function toBlob(b64,mime){const i=new Image();i.src=`data:${mime};base64,${b64}`;await i.decode();const c=document.createElement("canvas");c.width=c.height=640;c.getContext("2d").drawImage(i,0,0,640,640);return new Promise(r=>c.toBlob(r,"image/jpeg",.85))}
+async function ensurePortrait(force){const w=document.getElementById("pw");const cur=await kv("get","portrait");
+  if(cur&&cur.blob)show(URL.createObjectURL(cur.blob));
+  const h=pHash();if(!force&&cur&&cur.hash===h)return; if(gen)return;gen=true;w&&w.classList.add("busy");
+  try{const d=await img(pPrompt());
+    if(!d.image)throw 0;const blob=await toBlob(d.image,d.mime);
+    await kv("put","portrait",{blob,hash:h}); // stored hash only moves forward after a real success
+    show(URL.createObjectURL(blob));}
+  catch{say(rnd(B.fail))} finally{gen=false;w&&w.classList.remove("busy")}}
+// ---------- UI ----------
+let mood="Suspicious";
+const say=t=>{const e=document.getElementById("ln");if(e)e.textContent=t};
+const ic={hydrate:'<path d="M12 3c3 4 5 6.5 5 9.5a5 5 0 0 1-10 0C7 9.500 9 7 12 3z"/>',snack:'<circle cx="12" cy="12" r="8"/><path d="M9 10h.01M14 9h.01M13 14h.01M9 14h.01"/>',tend:'<path d="M12 21v-9M12 12c0-4 3-6 7-6 0 4-3 6-7 6zM12 15c0-3-2-5-6-5 0 3 2 5 6 5z"/>',wiggle:'<path d="M5 12c2-4 3-4 5 0s3 4 5 0 3-4 4 0"/>'};
+const CD={hydrate:20,snack:18,tend:22,wiggle:16};const LB={hydrate:"Hydrate",snack:"Snack",tend:"Tend",wiggle:"Wiggle"};
+const ready=k=>!(S.cd||{})[k]||Date.now()-S.cd[k]>=CD[k]*36e5;
+function home(){
+  app.replaceChildren($(`<section><h1>${esc(S.name)}</h1><p class="stage" id="st"></p>
+  <div id="pw" aria-label="${esc(S.name)}"><svg viewBox="0 0 100 100"><ellipse cx="50" cy="60" rx="30" ry="28" fill="#2c4a3a"/><circle cx="50" cy="55" r="12" fill="#f1e6c8"/><circle cx="50" cy="55" r="6" fill="#07181a"/><path d="M28 36q22-17 44 0z" fill="#3a2547"/></svg></div>
+  <p class="voice line" id="ln"></p><div id="tray"></div>
+  <div class="care">${Object.keys(CD).map(k=>`<button data-k="${k}" aria-label="${LB[k]}"><svg viewBox="0 0 24 24">${ic[k]}</svg>${LB[k]}</button>`).join("")}</div>
+  <div class="acts"><button class="act" id="a1">Tell Him Something</button><button class="act" id="a2">Teach Him a Word</button><button class="act" id="a3">Examine Closely</button><button class="act" id="a4">Play With Him</button><button class="act" id="a5">Journal</button><button class="act" id="a6">Gallery</button><button class="act" id="a7">Letters</button></div><div id="rt"></div></section>`));
+  const w=document.getElementById("pw");w.classList.toggle("melan",mood==="Dramatically Melancholy");
+  document.getElementById("st").textContent=`${stageName()} · day ${daysOld()} · ${MN[mood]}`;
+  const away=Math.floor((Date.now()-(S.prev_visit||Date.now()))/DAY);
+  say(rnd(away>=3?B.away:B.hi));
+  if(away>=1)ask([{role:"user",text:`[She just came back after ${away} days away. Greet her in one or two sentences. You waited.]`}],150).then(t=>t&&say(t));
+  refreshCare();
+  document.querySelectorAll(".care button").forEach(b=>{const k=b.dataset.k;
+    if(k==="tend"){let h;const dn=()=>{if(!ready("tend"))return;h=setTimeout(()=>{h=null;act("tend")},2000)};b.onpointerdown=dn;b.onpointerup=b.onpointerleave=()=>{clearTimeout(h)};}
+    else b.onclick=()=>act(k)});
+  document.getElementById("pw").onclick=()=>{clearTimeout(tt);taps++;tt=setTimeout(()=>taps=0,2500);if(taps>=5){taps=0;ensurePortrait(true)}};
+  a1.onclick=()=>openChat();a2.onclick=teach;a3.onclick=examine;a4.onclick=playMenu;a5.onclick=journalV;a6.onclick=galleryV;a7.onclick=lettersV;retBanner();thumb();bg();
+  ensurePortrait();}
+function refreshCare(){document.querySelectorAll(".care button").forEach(b=>b.classList.toggle("rest",!ready(b.dataset.k)))}
+async function act(k){
+  if(!ready(k)){say("He is still considering the last one. He will let you know.");return}
+  if(k==="wiggle"&&!S.wr&&Math.random()<.4){S.wr=1;save();say(rnd(B.refuse));return}
+  if(k==="snack"){const all=["🍪","🍓","🥜","🍯","🫐","🥕"],t=[...all].sort(()=>Math.random()-.5).slice(0,3);
+    const tr=document.getElementById("tray");tr.className="tray";tr.replaceChildren(...t.map(s=>{const b=$(`<button>${s}</button>`);b.onclick=()=>{tr.replaceChildren();tr.className="";S.snacks=S.snacks||{};S.snacks[s]=(S.snacks[s]||0)+1;go(k,s)};return b}));return}
+  go(k)}
+async function go(k,extra){S.wr=0;S.cd=S.cd||{};S.cd[k]=Date.now();S.totals=S.totals||{};S.totals[k]=(S.totals[k]||0)+1;if(k==="hydrate"&&S.totals[k]%25===0)setTimeout(()=>say(S.totals[k]+" drinks. He has been keeping count and refuses to say why."),2500);
+  const b=document.querySelector(`.care [data-k=${k}]`);b.classList.add("bounce");setTimeout(()=>b.classList.remove("bounce"),500);
+  const f=rnd(B[k]);say(f);if(k==="tend")S.discoveries=(S.discoveries||[]).concat(f);save();refreshCare();
+  const fav=extra&&Object.entries(S.snacks).sort((a,c)=>c[1]-a[1])[0][0];
+  const m={hydrate:"[She gave you water.]",snack:`[She gave you a snack: ${extra}. Over time you favor ${fav}.]`,tend:"[She tended the ground with you and you found a small Discovery. Describe it.]",wiggle:"[You just wiggled.]"}[k];
+  const t=await ask([{role:"user",text:m+" React in one or two sentences."}],150,6000);if(t)say(t)}
+async function examine(){const d=new Date().toDateString();if(S.ex===d){say("He has examined enough for one day. He is proud of the effort.");return}S.ex=d;
+  const f=rnd(B.disc);say(f);S.discoveries=(S.discoveries||[]).concat(f);save();
+  const t=await ask([{role:"user",text:"[She examined you closely and you revealed a small Discovery about yourself. One or two sentences.]"}],150,6000);if(t)say(t)}
+function teach(){const w=prompt("A word for him");if(!w||!w.trim())return;S.taught_vocabulary=(S.taught_vocabulary||[]).concat(w.trim().slice(0,30));save();say(rnd(B.word));
+  ask([{role:"user",text:`[She taught you the word "${w.trim().slice(0,30)}". Use it, correctly or with great confidence, wrongly. One or two sentences.]`}],150,6000).then(t=>t&&say(t))}
+// ---------- Tell Him Something ----------
+function openChat(){const s=document.getElementById("sheet");s.classList.add("open");ti.focus();
+  if(!log.children.length)(S.conversation_log||[]).slice(-10).forEach(x=>{add("me",x.u);add("him",x.h)})}
+function add(c,t){const e=$(`<div class="${c}">${esc(t)}</div>`);log.append(e);log.scrollTop=1e9;return e}
+sx.onclick=()=>sheet.classList.remove("open");
+async function send(){const v=ti.value.trim();if(!v)return;ti.value="";add("me",v);const h=add("him","…");
+  const hist=(S.conversation_log||[]).slice(-10).flatMap(x=>[{role:"user",text:x.u},{role:"assistant",text:x.h}]);
+  const t=await ask([...hist,{role:"user",text:v}],260,12000)||rnd(B.tell);h.textContent=t;
+  S.conversation_log=(S.conversation_log||[]).concat({u:v.slice(0,300),h:t});save()}
+ts.onclick=send;ti.onkeydown=e=>{if(e.key==="Enter")send()};
+// ---------- naming + assembly ----------
+function naming(){app.replaceChildren($(`<section><p class="voice">Before we begin building him... he will need a name. Choose carefully. He will have strong feelings about it.</p>
+ <input id="n" value="Glumbert L. Snox" maxlength="40" autocomplete="off" aria-label="Name"><p class="sub">The L. stands for whatever you'd like. It is traditional and non-negotiable.</p><button class="go" id="g">This is his name</button></section>`));
+ g.onclick=()=>{const v=n.value.trim();if(!v)return;S={name:v.slice(0,40),first_launch_date:Date.now(),assembly:{},visits:1};save();boot()}}
+function choosing(p){let pk=null;const el=$(`<section><h1>${esc(S.name)}</h1><p class="voice">${p.t}.</p><div class="opts">${p.o.map((o,i)=>`<button class="opt" data-i="${i}" aria-pressed="false">${esc(o)}</button>`).join("")}</div><button class="go" id="lk" disabled>This one</button></section>`);
+ app.replaceChildren(el);el.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{pk=+b.dataset.i;el.querySelectorAll(".opt").forEach(x=>x.setAttribute("aria-pressed",x===b));el.querySelector("#lk").disabled=false});
+ el.querySelector("#lk").onclick=()=>{S.assembly[p.k]=p.o[pk];save();boot()}}
+function boot(){if(!S.name)return naming();
+  const done=P.filter(p=>S.assembly[p.k]).length;
+  if(done<P.length){ // two pieces open per calendar day; late returns open everything, no penalty
+    if(done>=Math.min(P.length,daysOld()*2)){app.replaceChildren($(`<section><h1>${esc(S.name)}</h1><p class="voice">He is not finished yet. He is thinking about it.</p></section>`));return}
+    return choosing(P[done])}
+  // once per calendar day: count the visit, set today's mood
+  const today=new Date().toDateString();
+  if(S.last_day!==today){S.prev_visit=S.last_open||Date.now();S.visits=(S.visits||0)+1;S.last_day=today;S.visit_log=(S.visit_log||[]).concat(Date.now());
+    const away=Math.floor((Date.now()-S.prev_visit)/DAY);S.mood=away>=3?"Dramatically Melancholy":rnd(MOODS)}
+  S.last_open=Date.now();save();mood=S.mood||"Suspicious";home()}
+
+// ---------- sub screens ----------
+function sub(title,html,after){app.replaceChildren($(`<section class="sub2"><button class="back" id="bk">← ${esc(S.name)}</button><h1>${title}</h1>${html}</section>`));bk.onclick=()=>boot();scrollTo(0,0);after&&after()}
+async function journalV(){if(stageIx()<2){sub("Private Thoughts",`<p class="voice">He is still deciding what to share.</p>`);return}
+  sub(esc(S.name)+"'s Private Thoughts (That He Has Decided to Share)",(S.journal||[]).slice().reverse().map(e=>`<div class="note hand">${esc(e.t)}</div>`).join("")||`<p class="voice">Nothing yet. He is composing.</p>`)}
+async function lettersV(){const L=(S.letters||[]).concat(S.postcards||[]).sort((a,b)=>b.d-a.d);
+  sub("Letters",L.map(e=>`<div class="note hand">${esc(e.t)}</div>`).join("")||`<p class="voice">None yet. He will write when it is time.</p>`)}
+async function galleryV(){sub("Gallery",`<div class="gal" id="gl">${(S.gallery||[]).length?"":'<p class="voice">The walls are bare for now.</p>'}</div>`,async()=>{
+  for(const g of(S.gallery||[]).slice().reverse()){const r=await kv("get","g"+g.id);if(!r)continue;const f=$(`<figure><img alt="${esc(g.title)}" src="${URL.createObjectURL(r)}"><figcaption>${esc(g.title)}</figcaption></figure>`);gl.append(f)}})}
+// ---------- background gifts: letters, journal, gallery, postcards ----------
+let busy=0;
+async function bg(){if(busy)return;busy=1;try{
+  if(S.ls==null)S.ls=stageIx();
+  while(S.ls<stageIx()){S.ls++;const t=await ask([{role:"user",text:`[Write a full letter to her marking your growth into ${SN[S.ls]}. Warm, specific, a few short paragraphs, no more than 150 words. Sign it exactly: ${S.name}, ${stageName()}]`}],420,25000);
+    if(!t)break;S.letters=(S.letters||[]).concat({t,d:Date.now()});save()}
+  if(stageIx()>=2&&(!S.jd||Date.now()-S.jd>7*DAY)){const t=await ask([{role:"user",text:"[Write this week's entry in your private journal, titled nothing, four sentences at most, about something you noticed or decided.]"}],260,20000);if(t){S.journal=(S.journal||[]).concat({t,d:Date.now()});S.jd=Date.now();save()}}
+  if(stageIx()>=1&&(!S.gn||Date.now()>S.gn)){const tt=await ask([{role:"user",text:"[Give a mysterious title, three to six words, for a painting you made. Title only, no quotes.]"}],30,15000);
+    if(tt){const d=await img(`A small painterly artwork made by a creature: an abstract, dreamlike scene titled "${tt}", moss and velvet textures, bioluminescent glow, deep teal atmosphere, no text.`);
+      if(d.image){const id=Date.now();await kv("put","g"+id,await toBlob(d.image,d.mime));S.gallery=(S.gallery||[]).concat({id,title:tt.replace(/["\n]/g,""),d:id});
+        while(S.gallery.length>12){await kv("put","g"+S.gallery.shift().id,null)}S.gn=Date.now()+(10+Math.random()*4)*DAY;save()}}}
+  if(S.pc&&Date.now()>=S.pc.next&&S.pc.left>0){const t=await ask([{role:"user",text:`[You are ${S.pc.name}, retired. Write a short postcard to her, two sentences, from wherever you are. Do not name a place.]`}],120,15000);
+    if(t){S.postcards=(S.postcards||[]).concat({t:t+"\n— "+S.pc.name,d:Date.now()});S.pc.left--;S.pc.next=Date.now()+(7+Math.random()*3)*DAY;save()}}
+ }finally{busy=0}}
+// ---------- retiredment ----------
+function retBanner(){if(daysOld()<78||!document.getElementById("rt"))return;rt.innerHTML=`<button class="act" id="rb">He has something to tell you. No rush.</button>`;rb.onclick=retire}
+async function retire(){say("He is gathering himself.");const t=await ask([{role:"user",text:"[You are retiring. Tell her exactly three specific things you want her to know, as three short numbered lines. Warm, no sadness, nothing about endings or loss.]"}],220,20000)||"1. You were easy to wait for.\n2. The clouds approve of you.\n3. He will write.";
+  sub("Retiredment",`<p class="voice" style="white-space:pre-wrap">${esc(t)}</p><p class="voice">🎩 🎉 🎩</p><p class="voice">He will write.</p><button class="go" id="egg">A new egg</button>`,()=>{
+    for(let i=0;i<6;i++){const e=$(`<div class="cf" style="left:${i*14-35}%">🎩</div>`);document.body.append(e);setTimeout(()=>e.remove(),2500)}
+    egg.onclick=()=>{ // archive everything first, nothing is ever lost
+      const pc=(S.past_companions||[]).concat({name:S.name,assembly:S.assembly,journal:S.journal||[],gallery:S.gallery||[],letters:S.letters||[],discoveries:S.discoveries||[],retired:Date.now()});
+      S={past_companions:pc,postcards:S.postcards||[],pc:{name:S.name,next:Date.now()+8*DAY,left:5}};save();boot()}})}
+// ---------- thumbnail ----------
+function thumb(){const w=document.getElementById("pw");if(!w)return;let th=document.getElementById("th");if(!th){th=$(`<div id="th" role="button" aria-label="Back to top"></div>`);document.body.append(th);th.onclick=()=>scrollTo({top:0,behavior:"smooth"})}
+  new IntersectionObserver(([e])=>{th.classList.toggle("on",!e.isIntersecting);const m=w.querySelector("img.on");th.innerHTML=m?`<img src="${m.src}" alt="">`:""}).observe(w)}
+// ---------- Play With Him ----------
+const GB={win:["He lost. He wishes it noted that he lost on purpose, for reasons.","Defeat. He is taking it with great, loud dignity."],lose:["He won. He is trying to be gracious. It is not going well.","Victory. He will mention this to the clouds."],draw:["A draw. He considers it a moral victory, and a small one."]};
+function playMenu(){sub("Play With Him",`<div class="acts"><button class="act" id="g1">Tic-Tac-Toe</button><button class="act" id="g2">Dots and Boxes</button></div><p class="voice" id="gr"></p>`,()=>{g1.onclick=ttt;g2.onclick=dab})}
+async function react(kind){const f=rnd(GB[kind]);const e=document.getElementById("gr");if(e)e.textContent=f;
+  const t=await ask([{role:"user",text:`[You just finished a game with her and ${kind==="win"?"she won":kind==="lose"?"you won":"it was a draw"}. One reaction, one or two sentences.]`}],100,8000);if(t&&document.getElementById("gr"))gr.textContent=t}
+function ttt(){let b=Array(9).fill(""),over=0;const L=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+  const w=p=>L.some(l=>l.every(i=>b[i]===p)),full=()=>b.every(x=>x);
+  const find=p=>{for(const l of L){const v=l.map(i=>b[i]);if(v.filter(x=>x===p).length===2&&v.includes(""))return l[v.indexOf("")]}return -1};
+  const ai=()=>{let m=find("O");if(m<0)m=find("X");if(m<0||Math.random()<.2){const f=[4,0,2,6,8,1,3,5,7].filter(i=>!b[i]);m=Math.random()<.3?rnd(b.map((x,i)=>x?-1:i).filter(i=>i>=0)):f[0]}b[m]="O"};
+  const draw=()=>{sub("Tic-Tac-Toe",`<div class="ttt">${b.map((x,i)=>`<button data-i="${i}" ${x||over?"disabled":""}>${x}</button>`).join("")}</div><p class="voice" id="gr"></p><button class="back" id="pm">← Games</button>`,()=>{pm.onclick=playMenu;document.querySelectorAll(".ttt button").forEach(k=>k.onclick=()=>{b[+k.dataset.i]="X";if(w("X"))over=1;else if(full())over=2;else{ai();if(w("O"))over=3;else if(full())over=2}draw();if(over)react(over===1?"win":over===2?"draw":"lose")})})};draw()}
+function dab(){const N=4,H=new Set(),V=new Set(),own={};let turn="X",sc={X:0,O:0},done=0;
+  const sides=(r,c)=>H.has(r+","+c)+H.has((r+1)+","+c)+V.has(r+","+c)+V.has(r+","+(c+1));
+  const add=(t,r,c,who)=>{(t==="h"?H:V).add(r+","+c);const bx=t==="h"?[[r-1,c],[r,c]]:[[r,c-1],[r,c]];let got=0;for(const[y,x]of bx)if(y>=0&&x>=0&&y<N&&x<N&&!own[y+","+x]&&sides(y,x)===4){own[y+","+x]=who;sc[who]++;got++}return got};
+  const lines=()=>{const a=[];for(let r=0;r<=N;r++)for(let c=0;c<N;c++)if(!H.has(r+","+c))a.push(["h",r,c]);for(let r=0;r<N;r++)for(let c=0;c<=N;c++)if(!V.has(r+","+c))a.push(["v",r,c]);return a};
+  const risky=([t,r,c])=>(t==="h"?[[r-1,c],[r,c]]:[[r,c-1],[r,c]]).some(([y,x])=>y>=0&&x>=0&&y<N&&x<N&&sides(y,x)===2);
+  const gain=l=>(l[0]==="h"?[[l[1]-1,l[2]],[l[1],l[2]]]:[[l[1],l[2]-1],[l[1],l[2]]]).some(([y,x])=>y>=0&&x>=0&&y<N&&x<N&&sides(y,x)===3);
+  const aiTurn=()=>{const a=lines();if(!a.length){fin();return}const m=a.find(gain)||(a.filter(l=>!risky(l)).length?rnd(a.filter(l=>!risky(l))):rnd(a));
+    if(add(m[0],m[1],m[2],"O")&&lines().length){draw();setTimeout(aiTurn,450)}else{turn="X";draw()}fin()};
+  const fin=()=>{if(!done&&!lines().length){done=1;react(sc.X>sc.O?"win":sc.X<sc.O?"lose":"draw")}};
+  const draw=()=>{const S0=60,P=20;let g="";
+    for(const[t,r,c]of lines())g+=t==="h"?`<line x1="${P+c*S0}" y1="${P+r*S0}" x2="${P+(c+1)*S0}" y2="${P+r*S0}" stroke="transparent" stroke-width="22" data-l="h,${r},${c}"/>`:`<line x1="${P+c*S0}" y1="${P+r*S0}" x2="${P+c*S0}" y2="${P+(r+1)*S0}" stroke="transparent" stroke-width="22" data-l="v,${r},${c}"/>`;
+    let d="";for(const k of H){const[r,c]=k.split(",").map(Number);d+=`<line x1="${P+c*S0}" y1="${P+r*S0}" x2="${P+(c+1)*S0}" y2="${P+r*S0}" stroke="#e8b86a" stroke-width="4" stroke-linecap="round"/>`}
+    for(const k of V){const[r,c]=k.split(",").map(Number);d+=`<line x1="${P+c*S0}" y1="${P+r*S0}" x2="${P+c*S0}" y2="${P+(r+1)*S0}" stroke="#e8b86a" stroke-width="4" stroke-linecap="round"/>`}
+    let bx="";for(const[k,v]of Object.entries(own)){const[y,x]=k.split(",").map(Number);bx+=`<text x="${P+x*S0+30}" y="${P+y*S0+40}" text-anchor="middle" font-size="26" fill="${v==="X"?"#9db3a6":"#e8b86a"}" font-family="Lora">${v==="X"?"you":"him"}</text>`}
+    let dt="";for(let r=0;r<=N;r++)for(let c=0;c<=N;c++)dt+=`<circle cx="${P+c*S0}" cy="${P+r*S0}" r="4" fill="#e9efe6"/>`;
+    sub("Dots and Boxes",`<svg id="bd" viewBox="0 0 ${P*2+N*S0} ${P*2+N*S0}">${bx}${d}${dt}${g}</svg><p class="voice">You ${sc.X} · Him ${sc.O}</p><p class="voice" id="gr"></p><button class="back" id="pm">← Games</button>`,()=>{pm.onclick=playMenu;
+      document.querySelectorAll("#bd [data-l]").forEach(e=>e.onclick=()=>{if(turn!=="X"||done)return;const[t,r,c]=e.dataset.l.split(",");const got=add(t,+r,+c,"X");if(got&&lines().length){draw()}else{turn="O";draw();setTimeout(aiTurn,450)}fin()})})};draw()}
+if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});
+boot();
+</script></body></html>
